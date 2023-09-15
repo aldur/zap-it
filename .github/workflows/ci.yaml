@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+
+  schedule:
+    - cron: "0 0 * * MON"
+
+permissions:
+  contents: read
+
+# Cancel existing executions when new commits are pushed onto the branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4.0.0
+      - uses: DeterminateSystems/nix-installer-action@v4
+      - uses: DeterminateSystems/magic-nix-cache-action@v2
+      - run: nix flake check

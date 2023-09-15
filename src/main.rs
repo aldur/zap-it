@@ -143,9 +143,9 @@ async fn feed(Extension(pool): Extension<SqlitePool>) -> impl IntoResponse {
                 .collect();
 
             let channel = ChannelBuilder::default()
-                .title("Aldur's zap-it-later")
+                .title("Aldur's zap-it-later ⚡")
                 .link(domain)
-                .description("Stored links from the web, to an RSS feed.")
+                .description("Web link to an RSS feed.")
                 .image(Some(image))
                 .items(items)
                 .build();

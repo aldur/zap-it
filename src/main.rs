@@ -19,6 +19,7 @@ use tower_http::services::ServeDir;
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
 
+const DEFAULT_DATABASE_URL: &str = "sqlite:db.sqlite";
 const DEFAULT_LISTEN_PORT: &str = "3000";
 const DEFAULT_DOMAIN: &str = "localhost";
 const LISTEN_IFACE: &str = "0.0.0.0";
@@ -82,7 +83,14 @@ async fn main() -> anyhow::Result<()> {
 }
 
 async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
-    let db_url = env::var("DATABASE_URL")?;
+    let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| {
+        tracing::warn!(
+            "Could not get `DATABASE_URL` environment variable, defaulting to `{}`.",
+            DEFAULT_DATABASE_URL
+        );
+        DEFAULT_DATABASE_URL.to_string()
+    });
+
     let conn = SqliteConnectOptions::from_str(&db_url)?
         .journal_mode(SqliteJournalMode::Wal)
         .create_if_missing(true)
@@ -95,7 +103,7 @@ async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
         .max_connections(50)
         .connect(&db_url)
         .await
-        .context("could not connect to DATABASE_URL")?;
+        .with_context(|| format!("could not connect to DATABASE_URL: {}", &db_url))?;
 
     // prepare schema in db if it does not yet exist
     sqlx::migrate!().run(&pool).await?;

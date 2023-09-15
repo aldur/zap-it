@@ -1,8 +1,9 @@
 use std::env;
 use std::str::FromStr;
+use std::sync::Arc;
 
 use anyhow::Context;
-use axum::extract;
+use axum::extract::{self, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -42,6 +43,10 @@ struct Item {
     pub_date: chrono::NaiveDateTime,
 }
 
+struct AppState {
+    domain: String,
+}
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
@@ -52,9 +57,19 @@ async fn main() -> anyhow::Result<()> {
     // https://github.com/Bodobolero/axum_crud_api/blob/master/src/main.rs
     let pool = prepare_database().await?;
 
+    let domain = env::var("DOMAIN").unwrap_or_else(|_| {
+        tracing::warn!(
+            "`DOMAIN` environment variable is not set, defaulting to `{}`.",
+            DEFAULT_DOMAIN
+        );
+        DEFAULT_DOMAIN.to_string()
+    });
+    let shared_state = Arc::new(AppState { domain });
+
     let app = Router::new()
         .route(FEED, get(feed))
         .route("/add", post(add_item))
+        .with_state(shared_state)
         .nest_service(&(format!("/{}", ASSETS_PATH)), ServeDir::new(ASSETS_PATH))
         .layer(Extension(pool))
         .layer(
@@ -65,7 +80,7 @@ async fn main() -> anyhow::Result<()> {
 
     let listen_port = env::var("LISTEN_PORT").unwrap_or_else(|_| {
         tracing::warn!(
-            "Could not get `LISTEN_PORT`, defaulting to {}.",
+            "`LISTEN_PORT` is not set, defaulting to {}.",
             DEFAULT_LISTEN_PORT
         );
         DEFAULT_LISTEN_PORT.to_string()
@@ -73,7 +88,7 @@ async fn main() -> anyhow::Result<()> {
 
     let addr = format!("{}:{}", LISTEN_IFACE, listen_port);
 
-    tracing::info!("Listening on {}", addr);
+    tracing::info!("Listening on {}...", addr);
 
     axum::Server::bind(&addr.parse().unwrap())
         .serve(app.into_make_service())
@@ -85,7 +100,7 @@ async fn main() -> anyhow::Result<()> {
 async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
     let db_url = env::var("DATABASE_URL").unwrap_or_else(|_| {
         tracing::warn!(
-            "Could not get `DATABASE_URL` environment variable, defaulting to `{}`.",
+            "`DATABASE_URL` environment variable is not set, defaulting to `{}`.",
             DEFAULT_DATABASE_URL
         );
         DEFAULT_DATABASE_URL.to_string()
@@ -103,7 +118,7 @@ async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
         .max_connections(50)
         .connect(&db_url)
         .await
-        .with_context(|| format!("could not connect to DATABASE_URL: {}", &db_url))?;
+        .with_context(|| format!("could not connect to DATABASE_URL '{}'", &db_url))?;
 
     // prepare schema in db if it does not yet exist
     sqlx::migrate!().run(&pool).await?;
@@ -111,19 +126,14 @@ async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
     Ok(pool)
 }
 
-async fn feed(Extension(pool): Extension<SqlitePool>) -> impl IntoResponse {
+async fn feed(
+    Extension(pool): Extension<SqlitePool>,
+    State(state): State<Arc<AppState>>,
+) -> impl IntoResponse {
     // If you need it, here's the RSS 2.0 specification:
     // https://www.rssboard.org/rss-draft-1
-    let domain = env::var("DOMAIN").unwrap_or_else(|_| {
-        tracing::warn!(
-            "Could not get `DOMAIN` environment variable, defaulting to `{}`.",
-            DEFAULT_DOMAIN
-        );
-        DEFAULT_DOMAIN.to_string()
-    });
-
     let mut image = Image::default();
-    image.set_url(format!("{}/{}/{}", domain, ASSETS_PATH, IMAGE));
+    image.set_url(format!("{}/{}/{}", &(state.domain), ASSETS_PATH, IMAGE));
 
     // NOTE: We could stream, but it's not worth for 50 items.
     let result = sqlx::query_as!(
@@ -152,7 +162,7 @@ async fn feed(Extension(pool): Extension<SqlitePool>) -> impl IntoResponse {
 
             let channel = ChannelBuilder::default()
                 .title("Aldur's zap-it-later ⚡")
-                .link(domain)
+                .link(&(state.domain))
                 .description("Web link to an RSS feed.")
                 .image(Some(image))
                 .items(items)

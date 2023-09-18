@@ -142,6 +142,7 @@ async fn feed(
     // If you need it, here's the RSS 2.0 specification:
     // https://www.rssboard.org/rss-draft-1
     let mut image = Image::default();
+    image.set_link(&(state.domain));
     image.set_title("Link icon");
     image.set_url(format!("{}/{}/{}", &(state.domain), ASSETS_PATH, IMAGE));
 

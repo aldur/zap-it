@@ -23,7 +23,7 @@ use tracing::Level;
 const DEFAULT_DATABASE_URL: &str = "sqlite:db.sqlite";
 const DEFAULT_LISTEN_PORT: &str = "3000";
 const DEFAULT_DOMAIN: &str = "localhost";
-const LISTEN_IFACE: &str = "0.0.0.0";
+const DEFAULT_LISTEN_IFACE: &str = "0.0.0.0";
 
 const ASSETS_PATH: &str = "assets";
 const FEED: &str = "/feed.xml";
@@ -87,7 +87,15 @@ async fn main() -> anyhow::Result<()> {
         DEFAULT_LISTEN_PORT.to_string()
     });
 
-    let addr = format!("{}:{}", LISTEN_IFACE, listen_port);
+    let listen_iface = env::var("LISTEN_IFACE").unwrap_or_else(|_| {
+        tracing::warn!(
+            "`LISTEN_IFACE` is not set, defaulting to {}.",
+            DEFAULT_LISTEN_IFACE
+        );
+        DEFAULT_LISTEN_IFACE.to_string()
+    });
+
+    let addr = format!("{}:{}", listen_iface, listen_port);
 
     tracing::info!("Listening on {}...", addr);
 

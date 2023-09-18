@@ -35,6 +35,7 @@ fn default_pub_date() -> chrono::NaiveDateTime {
 
 #[derive(Deserialize)]
 struct Item {
+    title: String,
     link: String,
 
     // NOTE: We can't make it non-naive when using `query_as!`:
@@ -139,7 +140,7 @@ async fn feed(
     let result = sqlx::query_as!(
         Item,
         r#"
-            SELECT link, pub_date
+            SELECT title, link, pub_date
             FROM items
             LIMIT 50
         "#
@@ -154,6 +155,7 @@ async fn feed(
                 .into_iter()
                 .map(|row| {
                     ItemBuilder::default()
+                        .title(row.title)
                         .link(row.link)
                         .pub_date(row.pub_date.and_utc().to_rfc2822())
                         .build()
@@ -187,7 +189,8 @@ async fn add_item(
     extract::Json(payload): extract::Json<Item>,
 ) -> impl IntoResponse {
     let result = sqlx::query_scalar!(
-        "INSERT INTO items (link, pub_date) VALUES (?, ?) RETURNING id",
+        "INSERT INTO items (title, link, pub_date) VALUES (?, ?, ?) RETURNING id",
+        payload.title,
         payload.link,
         payload.pub_date,
     )

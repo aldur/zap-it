@@ -66,14 +66,6 @@
             filter = sourceFilter;
           };
 
-          migrationsFile = pkgs.runCommand
-            "migrations"
-            { }
-            ''
-              mkdir $out
-              cp -R ${src}/migrations $out/migrations
-            '';
-
           assetsFile = pkgs.runCommand
             "assets"
             { }
@@ -197,7 +189,6 @@
               tag = "latest";
               contents = [
                 zap-it-later
-                migrationsFile
                 assetsFile
               ];
               config = {

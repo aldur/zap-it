@@ -66,6 +66,22 @@
             filter = sourceFilter;
           };
 
+          migrationsFile = pkgs.runCommand
+            "migrations"
+            { }
+            ''
+              mkdir $out
+              cp -R ${src}/migrations $out/migrations
+            '';
+
+          assetsFile = pkgs.runCommand
+            "assets"
+            { }
+            ''
+              mkdir $out
+              cp -R ${craneLib.path ./.}/assets $out/assets
+            '';
+
           # Common arguments can be set here to avoid repeating them later
           commonArgs = {
             inherit src;
@@ -179,7 +195,11 @@
             dockerImage = pkgs.dockerTools.streamLayeredImage {
               name = "zap-it-later";
               tag = "latest";
-              contents = [ zap-it-later ];
+              contents = [
+                zap-it-later
+                migrationsFile
+                assetsFile
+              ];
               config = {
                 Cmd = [ "${zap-it-later}/bin/zap-it-later" ];
               };

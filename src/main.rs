@@ -173,7 +173,7 @@ async fn feed(
                 .collect();
 
             let channel = ChannelBuilder::default()
-                .title("Aldur's zap-it-later ⚡")
+                .title("Aldur's ZapIt ⚡")
                 .link(&(state.domain))
                 .description("Web link to an RSS feed.")
                 .image(Some(image))

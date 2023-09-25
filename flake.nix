@@ -1,5 +1,5 @@
 {
-  description = "ZapItLater";
+  description = "ZapIt";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
@@ -98,14 +98,14 @@
 
           # Build the actual crate itself, reusing the dependency
           # artifacts from above.
-          zap-it-later = craneLib.buildPackage (commonArgs // {
+          zap-it = craneLib.buildPackage (commonArgs // {
             inherit cargoArtifacts;
           });
         in
         {
           checks = {
             # Build the crate as part of `nix flake check` for convenience
-            inherit zap-it-later;
+            inherit zap-it;
 
             # Run clippy (and deny all warnings) on the crate source,
             # again, resuing the dependency artifacts from above.
@@ -113,12 +113,12 @@
             # Note that this is done as a separate derivation so that
             # we can block the CI if there are issues here, but not
             # prevent downstream consumers from building our crate by itself.
-            zap-it-later-clippy = craneLib.cargoClippy (commonArgs // {
+            zap-it-clippy = craneLib.cargoClippy (commonArgs // {
               inherit cargoArtifacts;
               cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
             });
 
-            zap-it-later-sqlx = craneLib.mkCargoDerivation
+            zap-it-sqlx = craneLib.mkCargoDerivation
               (commonArgs // {
 
                 buildPhaseCargoCommand = ''
@@ -149,26 +149,26 @@
                 pnameSuffix = "-sqlx";
               });
 
-            zap-it-later-doc = craneLib.cargoDoc (commonArgs // {
+            zap-it-doc = craneLib.cargoDoc (commonArgs // {
               inherit cargoArtifacts;
             });
 
             # Check formatting
-            zap-it-later-fmt = craneLib.cargoFmt {
+            zap-it-fmt = craneLib.cargoFmt {
               inherit src;
             };
 
             # Audit dependencies
-            zap-it-later-audit = craneLib.cargoAudit {
+            zap-it-audit = craneLib.cargoAudit {
               inherit src advisory-db;
               # https://github.com/launchbadge/sqlx/issues/2755
               cargoAuditExtraArgs = " --ignore RUSTSEC-2023-0018";
             };
 
             # Run tests with cargo-nextest
-            # Consider setting `doCheck = false` on `zap-it-later` if you do not want
+            # Consider setting `doCheck = false` on `zap-it` if you do not want
             # the tests to run twice
-            zap-it-later-nextest = craneLib.cargoNextest (commonArgs // {
+            zap-it-nextest = craneLib.cargoNextest (commonArgs // {
               inherit cargoArtifacts;
               partitions = 1;
               partitionType = "count";
@@ -176,33 +176,33 @@
           } // lib.optionalAttrs (system == "x86_64-linux") {
             # NB: cargo-tarpaulin only supports x86_64 systems
             # Check code coverage (note: this will not upload coverage anywhere)
-            zap-it-later-coverage = craneLib.cargoTarpaulin (commonArgs // {
+            zap-it-coverage = craneLib.cargoTarpaulin (commonArgs // {
               inherit cargoArtifacts;
             });
           };
 
           packages = {
-            default = zap-it-later;
+            default = zap-it;
 
             dockerImage = pkgs.dockerTools.streamLayeredImage {
-              name = "zap-it-later";
+              name = "zap-it";
               tag = "latest";
               contents = [
-                zap-it-later
+                zap-it
                 assetsFile
               ];
               config = {
-                Cmd = [ "${zap-it-later}/bin/zap-it-later" ];
+                Cmd = [ "${zap-it}/bin/zap-it" ];
               };
             };
 
-            # zap-it-later-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
+            # zap-it-llvm-coverage = craneLibLLvmTools.cargoLlvmCov (commonArgs // {
             #   inherit cargoArtifacts;
             # });
           };
 
           apps.default = flake-utils.lib.mkApp {
-            drv = zap-it-later;
+            drv = zap-it;
           };
 
           devShells.default = craneLib.devShell {

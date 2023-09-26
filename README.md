@@ -84,7 +84,21 @@ through Docker's internal network.
 
     # NOTE: We don't need to expose `feed.xml`, since `miniflux` will route
     # through the Docker network directly.
+    location = /feed.xml {
+        deny all;
+    }
+
     location = /add {
+        set $upstream_app zap_it;
+        set $upstream_port 3000;
+        set $upstream_proto http;
+        proxy_pass $upstream_proto://$upstream_app:$upstream_port;
+    }
+
+    # Disable basic auth for assets.
+    location = /assets/link-solid.png {
+        auth_basic off;
+        include /etc/nginx/snippets/base_proxy.conf;
         set $upstream_app zap_it;
         set $upstream_port 3000;
         set $upstream_proto http;

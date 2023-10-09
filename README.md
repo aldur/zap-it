@@ -67,9 +67,9 @@ For instance, `nginx` (or another reverse proxy) let us configure
 [Authelia](https://www.authelia.com) or HTTP basic auth to protect the exposed
 routes.
 
-Alternatively, [Tailscale](https://tailscale.com/kb/1223/tailscale-funnel/)'s
-funnel enables exposing specific routes (and even take care of HTTPS!) and
-taking care of access control.
+Alternatively, [Tailscale
+funnel](https://tailscale.com/kb/1223/tailscale-funnel/) can expose specific
+routes and take care of both HTTPS and access control.
 
 ## `nginx` reverse proxy and HTTP basic authentication
 

@@ -2,11 +2,12 @@
 
 Lightweight web-app to add links to an RSS feed.
 
-Rationale: I enjoy [Miniflux](https://miniflux.app). Zap-It, together with an
-iOS/macOS Shortcut, allows me to add web links to an RSS feed; Miniflux will
-pull items from the feed, fetch them (relying on its "Fetch original content"
-option) and add to my timeline. This quickly allow me to archive pages and/or
-read them later.
+Background [here](https://aldur.github.io/articles/2023/10/07/zap-it.html): I
+enjoy [Miniflux](https://miniflux.app). Zap-It, together with an [iOS/macOS
+Shortcut](https://www.icloud.com/shortcuts/83d641e49edc41858210d87f4eca6c33),
+allows me to add web links to an RSS feed; Miniflux will pull items from the
+feed, fetch them (relying on its "Fetch original content" option) and add to my
+timeline. This quickly allow me to archive pages and/or read them later.
 
 ## API
 

@@ -37,6 +37,20 @@ nix build
 nix run
 ```
 
+### Develop
+
+Use `sqlx` to create a local DB. We'll also initialize migrations and prepare
+query metadata for offline/compile runtime checks.
+
+```bash
+sqlx database create
+sqlx migrate run
+cargo sqlx prepare  # add metadata to `.sqlx`
+
+# Then, since the CI enforces up-to-date metadata:
+git add `.sqlx`
+```
+
 ### Docker image
 
 Through `nix`:

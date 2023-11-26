@@ -152,6 +152,7 @@ async fn feed(
         r#"
             SELECT title, link, pub_date
             FROM items
+            ORDER BY pub_date DESC
             LIMIT 50
         "#
     )

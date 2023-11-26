@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
     nixpkgs-sqlx-cli.url = "github:NixOS/nixpkgs/9c017f716424426c20e429a20baaee329b062b45";
+    nixpkgs-build-rust-crate.url = "github:NixOS/nixpkgs/344a502055f1c6ab5587169137ce2b566460edb5";
 
     crane = {
       url = "github:ipetkov/crane";
@@ -26,16 +27,21 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-sqlx-cli, crane, rust-overlay, flake-utils, advisory-db, ... }:
+  outputs = { self, nixpkgs, nixpkgs-sqlx-cli, nixpkgs-build-rust-crate, crane, rust-overlay, flake-utils, advisory-db, ... }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
           overlay-sqlx-cli = final: prev: {
             sqlx-cli = nixpkgs-sqlx-cli.legacyPackages.${prev.system}.sqlx-cli;
           };
+          overlay-build-rust-crate = self: super: super.lib.optionalAttrs super.stdenv.hostPlatform.isDarwin {
+            buildRustCrate = nixpkgs-build-rust-crate.legacyPackages.${super.system}.buildRustCrate;
+          };
+
           overlays = [
             (import rust-overlay)
             overlay-sqlx-cli
+            overlay-build-rust-crate
           ];
 
           pkgs = import nixpkgs {

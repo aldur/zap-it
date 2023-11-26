@@ -93,6 +93,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-build-rust-crate": {
+      "locked": {
+        "lastModified": 1696772921,
+        "narHash": "sha256-xOXcM68pgjZp6tXMaoQVEGzQPkHDDJdgcXCNoqljti4=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "344a502055f1c6ab5587169137ce2b566460edb5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "344a502055f1c6ab5587169137ce2b566460edb5",
+        "type": "github"
+      }
+    },
     "nixpkgs-sqlx-cli": {
       "locked": {
         "lastModified": 1689906769,
@@ -115,6 +131,7 @@
         "crane": "crane",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-build-rust-crate": "nixpkgs-build-rust-crate",
         "nixpkgs-sqlx-cli": "nixpkgs-sqlx-cli",
         "rust-overlay": "rust-overlay"
       }

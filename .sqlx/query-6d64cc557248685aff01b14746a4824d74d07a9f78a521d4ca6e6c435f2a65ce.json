@@ -1,6 +1,6 @@
 {
   "db_name": "SQLite",
-  "query": "\n            SELECT title, link, pub_date\n            FROM items\n            LIMIT 50\n        ",
+  "query": "\n            SELECT title, link, pub_date\n            FROM items\n            ORDER BY pub_date DESC\n            LIMIT 50\n        ",
   "describe": {
     "columns": [
       {
@@ -28,5 +28,5 @@
       false
     ]
   },
-  "hash": "6d8346d6b9532abcb16a7d61631c0043a132bfaa70e501b548f465db958a8694"
+  "hash": "6d64cc557248685aff01b14746a4824d74d07a9f78a521d4ca6e6c435f2a65ce"
 }

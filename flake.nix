@@ -121,7 +121,7 @@
             # prevent downstream consumers from building our crate by itself.
             zap-it-clippy = craneLib.cargoClippy (commonArgs // {
               inherit cargoArtifacts;
-              cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+              cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings -W clippy::pedantic";
             });
 
             zap-it-sqlx = craneLib.mkCargoDerivation

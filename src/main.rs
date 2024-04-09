@@ -120,7 +120,7 @@ async fn prepare_database() -> anyhow::Result<Pool<Sqlite>> {
         .create_if_missing(true)
         .connect()
         .await?;
-    sqlx::Connection::close(conn);
+    sqlx::Connection::close(conn).await?;
 
     // prepare connection pool
     let pool = SqlitePoolOptions::new()

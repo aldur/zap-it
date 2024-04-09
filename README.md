@@ -11,6 +11,11 @@ timeline. This quickly allow me to archive pages and/or read them later.
 
 ## Run it
 
+The simplest way to run `zap-it` is through [Docker](#docker). See below for how
+to build it using [`nix`](#build-it).
+
+### Docker
+
 Docker images are [published at
 `ghcr.io/aldur/zap-it:main`](https://github.com/aldur/zap-it/pkgs/container/zap-it).
 
@@ -28,58 +33,6 @@ zap_it:
   volumes:
     - ./zap/:/zap
 ```
-
-## API
-
-### `feed.xml`
-
-Point your RSS header to `/feed.xml`.
-
-```bash
-curl http://localhost:3000/feed.xml
-```
-
-### Add a new `link`
-
-Issue an HTTP `POST` to `/add`, providing a `json` object including the `link`
-and `title` keys:
-
-```bash
-curl --json '{"link":  "https://github.com/aldur/zap-it", "title": "Zap-It ⚡"}' http://localhost:3000/add
-```
-
-## Build
-
-If using `nix`:
-
-```bash
-nix build
-nix run
-```
-
-### Develop
-
-Use `sqlx` to create a local DB. We'll also initialize migrations and prepare
-query metadata for offline/compile runtime checks.
-
-```bash
-sqlx database create
-sqlx migrate run
-cargo sqlx prepare  # add metadata to `.sqlx`
-
-# Then, since the CI enforces up-to-date metadata:
-git add `.sqlx`
-```
-
-### Docker image
-
-Through `nix`:
-
-```bash
-nix build .#dockerImage && ./result | docker load
-```
-
-## Run
 
 ### Configuration
 
@@ -139,4 +92,54 @@ through Docker's internal network.
         set $upstream_proto http;
         proxy_pass $upstream_proto://$upstream_app:$upstream_port;
     }
+```
+
+## API
+
+### `feed.xml`
+
+Point your RSS header to `/feed.xml`.
+
+```bash
+curl http://localhost:3000/feed.xml
+```
+
+### Add a new `link`
+
+Issue an HTTP `POST` to `/add`, providing a `json` object including the `link`
+and `title` keys:
+
+```bash
+curl --json '{"link":  "https://github.com/aldur/zap-it", "title": "Zap-It ⚡"}' http://localhost:3000/add
+```
+
+## Build it
+
+If using `nix`:
+
+```bash
+nix build
+nix run
+```
+
+### Develop
+
+Use `sqlx` to create a local DB. We'll also initialize migrations and prepare
+query metadata for offline/compile runtime checks.
+
+```bash
+sqlx database create
+sqlx migrate run
+cargo sqlx prepare  # add metadata to `.sqlx`
+
+# Then, since the CI enforces up-to-date metadata:
+git add `.sqlx`
+```
+
+### Docker image
+
+Through `nix`:
+
+```bash
+nix build .#dockerImage && ./result | docker load
 ```

@@ -48,9 +48,11 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - env:
-          IMAGE_TAG: ${{ steps.meta.outputs.tags[0] }}
+          IMAGE_TAG: ${{ steps.meta.outputs.version }}
         run: |
           nix build .#dockerImage
           ./result | docker load
-          docker tag ${IMAGE_NAME}:latest ${IMAGE_NAME}:${IMAGE_TAG}
+          # zap-it is defined in `flake.nix`
+          # IMAGE_NAME instead is namespaced with the repository's author, e.g. `aldur/zap-it`
+          docker tag zap-it:latest ${IMAGE_NAME}:${IMAGE_TAG}
           docker push --all-tags ${IMAGE_NAME}

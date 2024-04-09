@@ -209,7 +209,7 @@ async fn add_item(
     .await;
 
     match result {
-        Ok(id) => (StatusCode::OK, format!("OK - {id}")),
+        Ok(id) => (StatusCode::OK, format!("⚡zap #{id}")),
         Err(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
     }
 }

@@ -2,7 +2,7 @@ name: Publish Docker image
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "docker_push"]  # FIXME
 
   schedule:
     - cron: "0 0 * * MON"

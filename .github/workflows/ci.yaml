@@ -35,7 +35,7 @@ jobs:
   publish:
     runs-on: ubuntu-22.04
     needs: check
-    if: github.ref == 'refs/heads/docker_push'  # FIXME
+    if: github.ref == 'refs/heads/main'
     permissions:
       packages: write
     steps:

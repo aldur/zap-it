@@ -9,6 +9,26 @@ allows me to add web links to an RSS feed; Miniflux will pull items from the
 feed, fetch them (relying on its "Fetch original content" option) and add to my
 timeline. This quickly allow me to archive pages and/or read them later.
 
+## Run it
+
+Docker images are [published at
+`ghcr.io/aldur/zap-it:main`](https://github.com/aldur/zap-it/pkgs/container/zap-it).
+
+If you are using `docker-compose`, you can run it as follows:
+
+```yaml
+zap_it:
+  restart: on-failure:5
+  container_name: zap_it
+  image: ghcr.io/aldur/zap-it:main
+  environment:
+    <<: *default-env-kv
+    DATABASE_URL: "sqlite:/zap/db.sqlite"
+    DOMAIN: "https://zap.${DOMAIN}"
+  volumes:
+    - ./zap/:/zap
+```
+
 ## API
 
 ### `feed.xml`

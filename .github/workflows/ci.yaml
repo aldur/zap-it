@@ -2,12 +2,17 @@ name: CI
 
 on:
   push:
+  workflow_dispatch:
+
+  release:
+    types: [published]
 
   schedule:
     - cron: "0 0 * * MON"
 
 permissions:
   contents: read
+  packages: write
 
 # Cancel existing executions when new commits are pushed onto the branch
 concurrency:
@@ -31,6 +36,8 @@ jobs:
     runs-on: ubuntu-22.04
     needs: check
     if: github.ref == 'refs/heads/docker_push'  # FIXME
+    permissions:
+      packages: write
     steps:
       - uses: actions/checkout@v4.0.0
       - uses: DeterminateSystems/nix-installer-action@v4

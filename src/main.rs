@@ -71,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
         .route(FEED, get(feed))
         .route("/add", post(add_item))
         .with_state(shared_state)
-        .nest_service(&(format!("/{}", ASSETS_PATH)), ServeDir::new(ASSETS_PATH))
+        .nest_service(&(format!("/{ASSETS_PATH}")), ServeDir::new(ASSETS_PATH))
         .layer(Extension(pool))
         .layer(
             TraceLayer::new_for_http()
@@ -95,7 +95,7 @@ async fn main() -> anyhow::Result<()> {
         DEFAULT_LISTEN_IFACE.to_string()
     });
 
-    let addr = format!("{}:{}", listen_iface, listen_port);
+    let addr = format!("{listen_iface}:{listen_port}");
 
     tracing::info!("Listening on {}...", addr);
 

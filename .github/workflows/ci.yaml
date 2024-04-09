@@ -35,7 +35,7 @@ jobs:
   publish:
     runs-on: ubuntu-22.04
     needs: check
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
     permissions:
       packages: write
     steps:

@@ -57,5 +57,8 @@ jobs:
       - run: |
           nix build .#dockerImage
           ./result | docker load
-          docker tag zap-it:latest ${DOCKER_METADATA_OUTPUT_TAGS}
-          docker push ${DOCKER_METADATA_OUTPUT_TAGS}
+          for TAG in ${DOCKER_METADATA_OUTPUT_TAGS}
+          do
+              docker tag zap-it:latest ${TAG}
+              docker push ${TAG}
+          done

@@ -19,6 +19,7 @@ use sqlx::{ConnectOptions, Pool};
 use tower_http::services::ServeDir;
 use tower_http::trace::{self, TraceLayer};
 use tracing::Level;
+use validator::Validate;
 
 const DEFAULT_DATABASE_URL: &str = "sqlite:db.sqlite";
 const DEFAULT_LISTEN_PORT: &str = "3000";
@@ -33,9 +34,11 @@ fn default_pub_date() -> chrono::NaiveDateTime {
     chrono::Utc::now().naive_utc()
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 struct Item {
     title: String,
+
+    #[validate(url)]
     link: String,
 
     // NOTE: We can't make it non-naive when using `query_as!`:
@@ -199,6 +202,11 @@ async fn add_item(
     Extension(pool): Extension<SqlitePool>,
     extract::Json(payload): extract::Json<Item>,
 ) -> impl IntoResponse {
+    match payload.validate() {
+        Ok(_) => (),
+        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
+    };
+
     let result = sqlx::query_scalar!(
         "INSERT INTO items (title, link, pub_date) VALUES (?, ?, ?) RETURNING id",
         payload.title,

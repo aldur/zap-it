@@ -220,7 +220,7 @@ async fn feed(State(state): State<AppState>) -> Result<impl IntoResponse, FeedEr
 
     Ok((
         StatusCode::OK,
-        [("Content-Type", "application/rss+xml; charset=utf-8")],
+        [("Content-Type", "application/xml")],
         channel.to_string(),
     ))
 }

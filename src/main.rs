@@ -2,18 +2,18 @@ use std::env;
 use std::str::FromStr;
 
 use anyhow::Context;
+use axum::Router;
 use axum::extract::{self, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
-use axum::Router;
 use rss::{ChannelBuilder, Image, ItemBuilder};
 use serde::Deserialize;
-use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::Pool;
+use sqlx::sqlite::SqlitePoolOptions;
 use sqlx::{
-    sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePool},
     Sqlite,
+    sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePool},
 };
 use tower_http::services::ServeDir;
 use tower_http::trace::{self, TraceLayer};

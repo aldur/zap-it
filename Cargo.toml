@@ -12,7 +12,7 @@ chrono = { version = "0.4.41", features = ["serde"] }
 rss = "2.0.12"
 serde = "1.0.219"
 # NOTE: Version here needs to match the one of `sqlx-cli` in `nixpkgs` for `nix flake check` to pass.
-sqlx = { version = "=0.8.5", default-features = false, features = [
+sqlx = { version = "=0.8.6", default-features = false, features = [
   "runtime-tokio",
   "sqlite",
   "chrono",
@@ -22,5 +22,5 @@ sqlx = { version = "=0.8.5", default-features = false, features = [
 tokio = { version = "1.45.1", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.6.6", features = ["trace", "fs"] }
 tracing = "0.1.41"
-tracing-subscriber = "0.3.19"
+tracing-subscriber = "0.3.20"
 validator = { version = "0.20.0", features = ["derive"] }

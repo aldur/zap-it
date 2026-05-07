@@ -152,8 +152,12 @@
         } // lib.optionalAttrs (system == "x86_64-linux") {
           # NB: cargo-tarpaulin only supports x86_64 systems
           # Check code coverage (note: this will not upload coverage anywhere)
-          zap-it-coverage =
-            craneLib.cargoTarpaulin (commonArgs // { inherit cargoArtifacts; });
+          # Use the LLVM engine: ptrace is blocked inside the Nix sandbox.
+          zap-it-coverage = craneLib.cargoTarpaulin (commonArgs // {
+            inherit cargoArtifacts;
+            cargoTarpaulinExtraArgs =
+              "--engine Llvm --skip-clean --out xml --output-dir $out";
+          });
         };
 
         packages = {
